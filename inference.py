@@ -301,7 +301,7 @@ class ExactInference(InferenceModule):
         pacmanPosition = gameState.getPacmanPosition()
         jailPosition = self.getJailPosition()
 
-        for ghostPosition in self.legalPositions:
+        for ghostPosition in self.allPositions:
             self.beliefs[ghostPosition] *= self.getObservationProb(observation, pacmanPosition, ghostPosition, jailPosition)
         self.beliefs.normalize()
 
@@ -367,7 +367,7 @@ class ParticleFilter(InferenceModule):
         jailPosition = self.getJailPosition()
         newDistribution = self.getBeliefDistribution()
 
-        for ghostPosition in self.legalPositions:
+        for ghostPosition in self.allPositions:
             newDistribution[ghostPosition] *= self.getObservationProb(observation, pacmanPosition, ghostPosition, jailPosition)
         if newDistribution.total() == 0:
             self.initializeUniformly(gameState)
