@@ -13,6 +13,7 @@
 
 
 import itertools
+import math
 import random
 
 from typing import Dict
@@ -297,12 +298,10 @@ class ExactInference(InferenceModule):
         position is known.
         """
         "*** YOUR CODE HERE ***"
-        pacman_xy = gameState.getPacmanPosition()
-        jail_xy = self.getJailPosition()
-        newBeliefs = DiscreteDistribution()
-        for ghost_xy in self.allPositions:
-            newBeliefs[ghost_xy] = self.getObservationProb(observation, pacman_xy, ghost_xy, jail_xy) * self.beliefs[ghost_xy]
-        self.beliefs = newBeliefs
+        pacmanPosition = gameState.getPacmanPosition()
+        jailPosition = self.getJailPosition()
+        for ghostPosition in self.allPositions:
+            self.beliefs[ghostPosition] *= self.getObservationProb(observation, pacmanPosition, ghostPosition, jailPosition)
         self.beliefs.normalize()
 
     def elapseTime(self, gameState):
@@ -347,7 +346,8 @@ class ParticleFilter(InferenceModule):
         """
         self.particles = []
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        for i in range(0, self.numParticles):
+            self.particles.append(self.legalPositions[i%len(self.legalPositions)])
 
     def observeUpdate(self, observation, gameState):
         """
@@ -362,7 +362,17 @@ class ParticleFilter(InferenceModule):
         the DiscreteDistribution may be useful.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        pacmanPosition = gameState.getPacmanPosition()
+        jailPosition = self.getJailPosition()
+        newDist = self.getBeliefDistribution()
+        for ghostPosition in self.allPositions:
+            newDist[ghostPosition] *= self.getObservationProb(observation, pacmanPosition, ghostPosition, jailPosition)
+
+        if newDist.total() == 0:
+            self.initializeUniformly(gameState)
+        else:
+            self.particles = [newDist.sample() for _ in range(0, self.numParticles)]
+
 
     def elapseTime(self, gameState):
         """
@@ -377,12 +387,15 @@ class ParticleFilter(InferenceModule):
         Return the agent's current belief state, a distribution over ghost
         locations conditioned on all evidence and time passage. This method
         essentially converts a list of particles into a belief distribution.
-        
+
         This function should return a normalized distribution.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
-
+        dist = DiscreteDistribution()
+        for particle in self.particles:
+            dist[particle] += 1
+        dist.normalize()
+        return dist
 
 class JointParticleFilter(ParticleFilter):
     """

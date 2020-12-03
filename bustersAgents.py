@@ -153,10 +153,10 @@ class GreedyBustersAgent(BustersAgent):
         for i in range(0, len(legal)):
             successorPosition = Actions.getSuccessor(pacmanPosition, legal[i])
             for ghostPosition in ghostPositions:
-                distance = util.manhattanDistance(successorPosition, ghostPosition)
+                distance = self.distancer.getDistance(successorPosition, ghostPosition)
                 if distance < closestDistance:
                     best = i
-                    closestDistyour time -= distance
+                    closestDistance = distance
         return legal[best]
 
 
