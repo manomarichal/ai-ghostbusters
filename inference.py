@@ -83,7 +83,7 @@ class DiscreteDistribution(dict):
         sum = self.total()
         if sum == 0: return
         for key in self.keys():
-             self[key] = self.get(key)/sum
+             self[key] /= sum
 
     def sample(self):
         """
@@ -364,14 +364,13 @@ class ParticleFilter(InferenceModule):
         "*** YOUR CODE HERE ***"
         pacmanPosition = gameState.getPacmanPosition()
         jailPosition = self.getJailPosition()
-        newDist = self.getBeliefDistribution()
+        newDistribution = self.getBeliefDistribution()
         for ghostPosition in self.allPositions:
-            newDist[ghostPosition] *= self.getObservationProb(observation, pacmanPosition, ghostPosition, jailPosition)
-
-        if newDist.total() == 0:
+            newDistribution[ghostPosition] *= self.getObservationProb(observation, pacmanPosition, ghostPosition, jailPosition)
+        if newDistribution.total() == 0:
             self.initializeUniformly(gameState)
         else:
-            self.particles = [newDist.sample() for _ in range(0, self.numParticles)]
+            self.particles = [newDistribution.sample() for _ in range(0, self.numParticles)]
 
 
     def elapseTime(self, gameState):
@@ -380,7 +379,7 @@ class ParticleFilter(InferenceModule):
         gameState.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        self.particles = [self.getPositionDistribution(gameState, particle).sample() for particle in self.particles]
 
     def getBeliefDistribution(self):
         """
