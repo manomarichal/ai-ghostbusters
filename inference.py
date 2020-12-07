@@ -372,7 +372,10 @@ class ParticleFilter(InferenceModule):
         if newDistribution.total() == 0:
             self.initializeUniformly(gameState)
         else:
-            self.particles = [newDistribution.sample() for _ in range(0, self.numParticles)]
+            self.particles= []
+            for index in range(0, self.numParticles):
+                self.particles.append(newDistribution.sample())
+
 
 
     def elapseTime(self, gameState):
@@ -381,7 +384,10 @@ class ParticleFilter(InferenceModule):
         gameState.
         """
         "*** YOUR CODE HERE ***"
-        self.particles = [self.getPositionDistribution(gameState, particle).sample() for particle in self.particles]
+        newParticles = []
+        for particle in self.particles:
+            newParticles.append(self.getPositionDistribution(gameState, particle).sample())
+        self.particles = newParticles
 
     def getBeliefDistribution(self):
         """
@@ -486,7 +492,9 @@ class JointParticleFilter(ParticleFilter):
         if newDistribution.total() == 0:
             self.initializeUniformly(gameState)
         else:
-            self.particles = [newDistribution.sample() for _ in range(0, self.numParticles)]
+            self.particles = []
+            for index in range(0, self.numParticles):
+                self.particles.append(newDistribution.sample())
 
     def elapseTime(self, gameState):
         """
